@@ -2,7 +2,6 @@ use std::rc::Rc;
 
 use dioxus::prelude::*;
 use dioxus_websocket_hooks::{use_ws_context, use_ws_context_provider_text};
-use fermi::{use_init_atom_root, use_read, use_set, Atom};
 
 fn main() {
     dioxus::web::launch(app);
@@ -26,15 +25,15 @@ fn ResponseDisplay(cx: Scope) -> Element {
     let response = use_read(&cx, WS_RESPONSE_ATOM);
     let ws = use_ws_context(&cx);
 
-    let (input, set_input) = use_state(&cx, String::default);
+    let input = use_state(&cx, String::default);
     let submit = move |_| {
         ws.send_text(input.to_string());
-        set_input(String::default());
+        input.set(String::default());
     };
 
     cx.render(rsx! (
         div { "Server sent: {response}" }
-        input { oninput: move |event| set_input(event.value.clone()), "{input}" }
+        input { oninput: move |event| input.set(event.value.clone()), "{input}" }
         button { onclick: submit, "Submit" }
     ))
 }
